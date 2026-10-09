@@ -1,9 +1,10 @@
+<?php $appBranding = app_branding($pdo); ?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Quest Hotel ITIMS</title>
+    <title><?php echo e($appBranding['product_name']); ?></title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
@@ -32,15 +33,15 @@
         <div class="flex flex-shrink-0 items-center gap-3 border-b border-slate-800 px-5 py-4">
             <!-- Logo Placeholder -->
             <div class="flex h-11 w-11 flex-shrink-0 items-center justify-center overflow-hidden rounded-xl bg-white/10">
-                <?php if (file_exists('assets/img/logo.png')): ?>
-                    <img src="assets/img/logo.png" alt="Quest Hotel Logo" class="h-9 w-9 object-contain">
+                <?php if ($appBranding['company_logo_path'] !== ''): ?>
+                    <img src="brand_logo.php" alt="<?php echo e($appBranding['organization_name']); ?> logo" class="h-9 w-9 object-contain">
                 <?php else: ?>
-                    <span class="text-sm font-black tracking-tight text-sky-300">IT</span>
+                    <span class="text-sm font-black tracking-tight text-sky-300"><?php echo e(strtoupper(substr($appBranding['product_name'], 0, 2))); ?></span>
                 <?php endif; ?>
             </div>
             <div class="min-w-0">
-                <p class="truncate text-sm font-bold tracking-wide text-white">Quest ITIMS</p>
-                <p class="mt-0.5 text-[9px] font-semibold uppercase tracking-[0.18em] text-slate-400">Inventory workspace</p>
+                <p class="truncate text-sm font-bold tracking-wide text-white"><?php echo e($appBranding['product_name']); ?></p>
+                <p class="mt-0.5 text-[9px] font-semibold uppercase tracking-[0.18em] text-slate-400"><?php echo e($appBranding['organization_name']); ?></p>
             </div>
         </div>
         
@@ -170,7 +171,7 @@
         </nav>
 
         <div class="flex-shrink-0 border-t border-slate-800 bg-slate-950/50 p-3 text-center">
-            <p class="text-[9px] text-slate-500 font-semibold uppercase tracking-widest">&copy; <?php echo date('Y'); ?> Quest Hotel</p>
+            <p class="text-[9px] text-slate-500 font-semibold uppercase tracking-widest">&copy; <?php echo date('Y'); ?> <?php echo e($appBranding['organization_name']); ?></p>
         </div>
     </aside>
 

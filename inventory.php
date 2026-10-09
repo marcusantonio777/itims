@@ -824,7 +824,7 @@ $vendors = $pdo->query("SELECT * FROM vendors ORDER BY vendor_name ASC")->fetchA
             <div id="qrContainer" class="bg-white p-4 inline-block rounded-2xl border-2 border-purple-100 mb-4 shadow-inner">
             </div>
             <h3 id="qrAssetTag" class="text-2xl font-black text-gray-800 tracking-tighter mb-2"></h3>
-            <p class="text-gray-500 text-xs mb-6 px-8">This QR code contains the Asset Tag for fast identification in the ITIMS mobile scanner.</p>
+            <p class="text-gray-500 text-xs mb-6 px-8">This QR code contains the asset tag for fast identification in a mobile scanner.</p>
             <button onclick="window.print()" class="w-full bg-gray-100 hover:bg-gray-200 text-gray-700 font-bold py-3 px-6 rounded-xl transition flex items-center justify-center">
                 <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"></path></svg>
                 Print Tag

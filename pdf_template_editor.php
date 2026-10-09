@@ -66,8 +66,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 }
 
+$appBranding = app_branding($pdo);
+$editorImage = $appBranding['company_logo_path'] !== ''
+    ? 'brand_logo.php?v=' . rawurlencode(basename($appBranding['company_logo_path']))
+    : 'data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs=';
 $sampleFields = [
-    'company_logo' => 'assets/img/logo.png',
+    'company_logo' => $editorImage,
+    'product_name' => $appBranding['product_name'],
+    'organization_name' => $appBranding['organization_name'],
+    'department_label' => $appBranding['department_label'],
     'paf_number' => 'ASSET-001-25',
     'date_issued' => date('F d, Y'),
     'employee_name' => 'Alex Morgan',
@@ -75,7 +82,7 @@ $sampleFields = [
     'employee_username' => 'amorgan',
     'department' => 'Information Technology',
     'position' => 'IT Specialist',
-    'asset_photo_url' => 'assets/img/logo.png',
+    'asset_photo_url' => 'data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs=',
     'asset_tag' => 'IT-LAP-001',
     'asset_category' => $categoryName ?: 'Laptop',
     'category_details' => 'Sample device, access, or identification details',
@@ -97,8 +104,8 @@ $sampleFields = [
     'supplies_section' => '<h3 style="background:#eee;padding:6px">INCLUDED ACCESSORIES / SUPPLIES</h3><table style="width:100%;border-collapse:collapse"><tr><th>Item Name</th><th>Brand/Model</th><th>Qty</th></tr><tr><td>USB-C Adapter</td><td>Example</td><td>1</td></tr></table>',
     'terms' => '1. Use this equipment for authorized work only.<br>2. Return it in good condition when requested.',
     'prepared_by' => 'IT STAFF',
-    'noted_by' => 'MARIO GERALDEZ',
-    'noted_by_title' => 'ASST. IT MANAGER',
+    'noted_by' => '',
+    'noted_by_title' => 'Authorized Approver',
     'received_by' => 'ALEX MORGAN',
     'received_by_title' => 'IT SPECIALIST',
     'generated_at' => date('Y-m-d H:i:s'),
@@ -111,7 +118,6 @@ $samplePhoto = $samplePhotoQuery->fetch();
 if ($samplePhoto && preg_match('~^uploads/assets/[A-Za-z0-9._-]+$~', (string)$samplePhoto['photo_path'])) {
     $sampleFields['asset_photo_url'] = 'generate_pdf.php?asset_photo_id=' . (int)$samplePhoto['id'];
 }
-$editorImage = is_file(__DIR__ . '/assets/img/logo.png') ? 'assets/img/logo.png' : 'data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs=';
 $editorHtml = str_replace('src="ITIMS_COMPANY_LOGO"', 'src="' . e($editorImage) . '" data-pdf-field="company_logo"', $template);
 $editorHtml = str_replace('src="ITIMS_ASSET_PHOTO_URL"', 'src="' . e($sampleFields['asset_photo_url']) . '" data-pdf-field="asset_photo_url"', $editorHtml);
 $previewBody = pdf_template_apply_fields(pdf_template_sanitize_html($template), $sampleFields);

@@ -294,7 +294,7 @@ include 'includes/header.php';
                     </label>
                     <textarea name="terms_text" id="termsText" rows="16" required
                         class="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 transition text-xs font-mono leading-relaxed custom-scrollbar"
-                        placeholder="1. Equipment is Quest Hotel property...&#10;2. Password must be changed on first login..."><?php
+                        placeholder="1. Equipment remains the property of the organization...&#10;2. Change initial credentials immediately..."><?php
                         echo e($edit_row['terms_text'] ?? '');
                     ?></textarea>
                 </div>

@@ -11,6 +11,8 @@ $db      = $db      ?? getenv('ITIMS_DB_NAME')    ?: '';
 $user    = $user    ?? getenv('ITIMS_DB_USER')    ?: '';
 $pass    = $pass    ?? getenv('ITIMS_DB_PASS')    ?: '';
 $charset = $charset ?? 'utf8mb4';
+$licenseKeyEncryptionKey = $licenseKeyEncryptionKey
+    ?? (getenv('ITIMS_LICENSE_KEY_ENCRYPTION_KEY') ?: '');
 
 if ($host === '' || $db === '' || $user === '') {
     http_response_code(500);
@@ -32,8 +34,10 @@ try {
     die('Unable to connect to the database. Please check configuration and try again.');
 }
 
+require_once __DIR__ . '/../includes/branding.php';
+
 $GLOBALS['AUDIT_ACTION_TYPES'] = [
-    'Create', 'Update', 'Delete', 'Login', 'Logout', 'Issue', 'Return',
+    'Create', 'Update', 'Delete', 'Login', 'Logout', 'Issue', 'Return', 'LicenseKeyReveal',
     'UserCreate', 'UserUpdate', 'UserRoleChange', 'UserDeactivate',
     'UserReactivate', 'UserPasswordReset', 'TermsCreate', 'TermsUpdate', 'TermsDelete',
 ];

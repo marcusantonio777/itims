@@ -27,3 +27,16 @@ documents in a report.
 - Serve the application over HTTPS.
 - Keep local configuration, database exports, logs, and uploads out of Git.
 - Apply schema migrations and review destructive settings before production use.
+- Configure a unique 32-byte Base64 encryption key using
+  `ITIMS_LICENSE_KEY_ENCRYPTION_KEY` before migrating existing software license
+  keys. Back it up separately and securely; changing or losing it makes stored
+  keys unreadable.
+- Only administrators can reveal stored software license keys. Reveals are
+  logged without writing the key value to the audit record.
+- Keep uploaded files behind server access controls and retain the application's
+  MIME, extension, and size validation. Test these protections on the production
+  web server rather than relying only on local `.htaccess` behavior.
+
+Before selling or publishing a release, review every Git history ref and Git
+LFS object for customer branding, private records, credentials, and documents.
+Removing a file from the current branch does not erase earlier copies.

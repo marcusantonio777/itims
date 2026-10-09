@@ -149,7 +149,7 @@ CREATE TABLE IF NOT EXISTS maintenance_logs (
 CREATE TABLE IF NOT EXISTS audit_logs (
     id INT AUTO_INCREMENT PRIMARY KEY,
     user_id INT,
-    action_type ENUM('Create', 'Update', 'Delete', 'Login', 'Logout', 'Issue', 'Return') NOT NULL,
+    action_type ENUM('Create', 'Update', 'Delete', 'Login', 'Logout', 'Issue', 'Return', 'LicenseKeyReveal') NOT NULL,
     table_affected VARCHAR(50),
     record_id INT,
     old_value TEXT,
@@ -168,7 +168,12 @@ CREATE TABLE IF NOT EXISTS system_settings (
 );
 
 INSERT INTO system_settings (setting_key, setting_value)
-VALUES ('allow_delete_assets_with_history', '0')
+VALUES
+    ('allow_delete_assets_with_history', '0'),
+    ('product_name', 'IT Asset Manager'),
+    ('organization_name', 'Your Organization'),
+    ('department_label', 'IT Department'),
+    ('company_logo_path', '')
 ON DUPLICATE KEY UPDATE setting_key = VALUES(setting_key);
 
 CREATE TABLE IF NOT EXISTS asset_disposal (
@@ -210,7 +215,7 @@ CREATE TABLE IF NOT EXISTS software_licenses (
     id INT AUTO_INCREMENT PRIMARY KEY,
     software_name VARCHAR(255) NOT NULL,
     vendor_name VARCHAR(255) DEFAULT NULL,
-    license_key VARCHAR(255) DEFAULT NULL,
+    license_key TEXT DEFAULT NULL,
     license_type VARCHAR(100) DEFAULT NULL,
     seats INT NOT NULL DEFAULT 1,
     cost DECIMAL(10,2) DEFAULT 0.00,
@@ -221,23 +226,25 @@ CREATE TABLE IF NOT EXISTS software_licenses (
     status ENUM('Active', 'Expiring Soon', 'Expired', 'Cancelled') NOT NULL DEFAULT 'Active',
     owner_name VARCHAR(255) DEFAULT NULL,
     notes TEXT,
+    attachment_name VARCHAR(255) DEFAULT NULL,
+    attachment_path VARCHAR(255) DEFAULT NULL,
     created_by INT DEFAULT NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     FOREIGN KEY (created_by) REFERENCES it_staff(id)
 );
 
--- Insert default admin (password: admin123)
-INSERT INTO it_staff (full_name, username, password_hash, role, is_active)
-VALUES ('System Admin', 'admin', '$2y$10$jyQgummwO7cPLI9MBoDPEe5/MA0duyaekYpK90RnDz08uo.9GDw7q', 'admin', 1)
-ON DUPLICATE KEY UPDATE
-    full_name = VALUES(full_name),
-    role = VALUES(role),
-    is_active = VALUES(is_active),
-    password_hash = CASE
-        WHEN password_hash = '' OR password_hash IS NULL THEN VALUES(password_hash)
-        ELSE password_hash
-    END;
-
--- Insert some categories
-INSERT INTO categories (category_name, prefix) VALUES ('Laptop', 'LPT'), ('Keycard', 'KCD'), ('Phone', 'PHN'), ('Desktop', 'DSK'), ('Monitor', 'MON');
+-- Seed standard categories only when neither the name nor prefix is present.
+INSERT INTO categories (category_name, prefix)
+SELECT seed.category_name, seed.prefix
+FROM (
+    SELECT 'Laptop' AS category_name, 'LPT' AS prefix
+    UNION ALL SELECT 'Keycard', 'KCD'
+    UNION ALL SELECT 'Phone', 'PHN'
+    UNION ALL SELECT 'Desktop', 'DSK'
+    UNION ALL SELECT 'Monitor', 'MON'
+) AS seed
+WHERE NOT EXISTS (
+    SELECT 1 FROM categories existing
+    WHERE existing.category_name = seed.category_name OR existing.prefix = seed.prefix
+);

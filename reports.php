@@ -61,7 +61,7 @@ if (!preg_match('/^\d{4}-\d{2}-\d{2}$/', $date_to)) {
 <div class="bg-white p-8 rounded-3xl shadow-sm border border-gray-100 print:shadow-none print:border-none">
     <div class="flex justify-between items-center mb-8 border-b border-gray-100 pb-6">
         <div>
-            <h2 class="text-xl font-black text-blue-900 uppercase italic">Quest Hotel ITIMS</h2>
+            <h2 class="text-xl font-black text-blue-900 uppercase italic"><?php echo e(app_branding($pdo)['product_name']); ?></h2>
             <p class="text-xs text-gray-400 font-bold uppercase tracking-tighter">
                 <?php 
                     $titles = ['summary' => 'Asset & Inventory Summary', 'deployment' => 'Asset Deployment Status', 'maintenance' => 'Maintenance & Repair History', 'warranty' => 'Warranty Expiry Report', 'licenses' => 'Software Contract & License Report'];

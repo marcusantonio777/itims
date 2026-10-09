@@ -485,7 +485,7 @@ include 'includes/header.php';
         <div class="bg-[#1e3a8a] p-6 text-white flex justify-between items-center">
             <div>
                 <h2 class="text-xl font-bold uppercase tracking-tight italic text-yellow-400">Create New User</h2>
-                <p class="text-blue-200 text-xs">Create a new operator account for the ITIMS system</p>
+                <p class="text-blue-200 text-xs">Create a new operator account for <?php echo e(app_branding($pdo)['product_name']); ?></p>
             </div>
             <button type="button" onclick="document.getElementById('createModal').classList.add('hidden')"
                     class="bg-white/10 hover:bg-white/20 p-2 rounded-full transition">

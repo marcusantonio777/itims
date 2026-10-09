@@ -20,6 +20,10 @@
 # Local editor and operating-system files
 /.trae/
 /.vscode/
+/node_modules/
+/.vite/
+/dist/
+/assets/img/logo.png
 .DS_Store
 Thumbs.db
 desktop.ini

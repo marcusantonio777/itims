@@ -35,10 +35,10 @@ function out(string $msg, string $status = ''): void {
 }
 
 if (!$isCli) {
-    echo '<!doctype html><html><head><meta charset="utf-8"><title>ITIMS Database Migrate</title>
+    echo '<!doctype html><html><head><meta charset="utf-8"><title>Application Database Migration</title>
     <style>body{font-family:system-ui,sans-serif;background:#0f172a;color:#e2e8f0;padding:24px;}
     h1{color:#fbbf24;} .wrap{max-width:900px;margin:0 auto;background:#1e293b;border:1px solid #334155;border-radius:12px;padding:20px;}</style>
-    </head><body><div class="wrap"><h1>ITIMS Database Migrate</h1><p style="color:#94a3b8;">Running all idempotent migrations...</p><hr>';
+    </head><body><div class="wrap"><h1>Application Database Migration</h1><p style="color:#94a3b8;">Running all idempotent migrations...</p><hr>';
 }
 
 out('Starting migrations...', 'info');
@@ -105,7 +105,7 @@ $migrations['audit_logs_table'] = static function (PDO $pdo): string {
     $pdo->exec("CREATE TABLE IF NOT EXISTS audit_logs (
         id INT AUTO_INCREMENT PRIMARY KEY,
         user_id INT,
-        action_type ENUM('Create','Update','Delete','Login','Logout','Issue','Return',
+        action_type ENUM('Create','Update','Delete','Login','Logout','Issue','Return','LicenseKeyReveal',
                          'UserCreate','UserUpdate','UserRoleChange','UserDeactivate',
                          'UserReactivate','UserPasswordReset','TermsCreate','TermsUpdate','TermsDelete')
                     NOT NULL DEFAULT 'Update',
@@ -128,13 +128,22 @@ $migrations['system_settings_table'] = static function (PDO $pdo): string {
         updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
         FOREIGN KEY (updated_by) REFERENCES it_staff(id) ON DELETE SET NULL
     ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;");
-    $stmt = $pdo->prepare("INSERT IGNORE INTO system_settings (setting_key, setting_value) VALUES (?, '0')");
-    $stmt->execute(['allow_delete_assets_with_history']);
-    return 'created or exists; protected-history deletion defaults to disabled';
+    $defaults = [
+        'allow_delete_assets_with_history' => '0',
+        'product_name' => 'IT Asset Manager',
+        'organization_name' => 'Your Organization',
+        'department_label' => 'IT Department',
+        'company_logo_path' => '',
+    ];
+    $stmt = $pdo->prepare("INSERT IGNORE INTO system_settings (setting_key, setting_value) VALUES (?, ?)");
+    foreach ($defaults as $key => $value) {
+        $stmt->execute([$key, $value]);
+    }
+    return 'created or exists; product branding defaults ensured';
 };
 
 $migrations['expand_audit_action_enum'] = static function (PDO $pdo): string {
-    $newEnum = "'Create','Update','Delete','Login','Logout','Issue','Return',
+    $newEnum = "'Create','Update','Delete','Login','Logout','Issue','Return','LicenseKeyReveal',
                  'UserCreate','UserUpdate','UserRoleChange','UserDeactivate',
                  'UserReactivate','UserPasswordReset','TermsCreate','TermsUpdate','TermsDelete'";
     $pdo->exec("ALTER TABLE audit_logs
@@ -262,7 +271,7 @@ $migrations['software_licenses_table'] = static function (PDO $pdo): string {
         id INT AUTO_INCREMENT PRIMARY KEY,
         software_name VARCHAR(255) NOT NULL,
         vendor_name VARCHAR(255) DEFAULT NULL,
-        license_key VARCHAR(255) DEFAULT NULL,
+        license_key TEXT DEFAULT NULL,
         license_type VARCHAR(100) DEFAULT NULL,
         seats INT NOT NULL DEFAULT 1,
         cost DECIMAL(10,2) DEFAULT 0.00,
@@ -273,6 +282,8 @@ $migrations['software_licenses_table'] = static function (PDO $pdo): string {
         status ENUM('Active', 'Expiring Soon', 'Expired', 'Cancelled') NOT NULL DEFAULT 'Active',
         owner_name VARCHAR(255) DEFAULT NULL,
         notes TEXT,
+        attachment_name VARCHAR(255) DEFAULT NULL,
+        attachment_path VARCHAR(255) DEFAULT NULL,
         created_by INT DEFAULT NULL,
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
         updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
@@ -382,6 +393,7 @@ $migrations['uploads_dirs'] = static function (): string {
         __DIR__ . '/../uploads/assets',
         __DIR__ . '/../uploads/licenses',
         __DIR__ . '/../uploads/file_manager',
+        __DIR__ . '/../uploads/branding',
     ];
     $created = 0;
     foreach ($dirs as $d) {
@@ -394,17 +406,7 @@ $migrations['uploads_dirs'] = static function (): string {
 };
 
 $migrations['default_admin_account'] = static function (PDO $pdo): string {
-    $hash = password_hash('admin123', PASSWORD_DEFAULT);
-    $sql = "INSERT INTO it_staff (full_name, username, password_hash, role, is_active, created_at)
-            VALUES ('System Admin', 'admin', ?, 'admin', 1, NOW())
-            ON DUPLICATE KEY UPDATE
-                full_name = VALUES(full_name),
-                role = VALUES(role),
-                is_active = VALUES(is_active)";
-    $stmt = $pdo->prepare($sql);
-    $stmt->execute([$hash]);
-    $pdo->prepare("UPDATE it_staff SET role = LOWER(role) WHERE username = 'admin' AND role IS NOT NULL AND role != 'admin'")->execute();
-    return 'admin account ensured';
+    return 'no default credentials created; use install/setup.php to create the first administrator';
 };
 
 $migrations['uploads_htaccess'] = static function (): string {
@@ -414,6 +416,7 @@ $migrations['uploads_htaccess'] = static function (): string {
         __DIR__ . '/../uploads/assets/.htaccess',
         __DIR__ . '/../uploads/licenses/.htaccess',
         __DIR__ . '/../uploads/file_manager/.htaccess',
+        __DIR__ . '/../uploads/branding/.htaccess',
     ];
     $updated = 0;
     foreach ($targets as $target) {
@@ -425,6 +428,14 @@ $migrations['uploads_htaccess'] = static function (): string {
             file_put_contents($target, $rules, LOCK_EX);
             $updated++;
         }
+    }
+    $licenseRules = "Require all denied\n";
+    $licenseAccessFile = __DIR__ . '/../uploads/licenses/.htaccess';
+    if (file_get_contents($licenseAccessFile) !== $licenseRules) {
+        if (file_put_contents($licenseAccessFile, $licenseRules, LOCK_EX) === false) {
+            throw new RuntimeException('Could not restrict direct access to software license attachments.');
+        }
+        $updated++;
     }
     return $updated ? "created $updated .htaccess file(s)" : 'htaccess already present';
 };
@@ -442,9 +453,60 @@ foreach ($migrations as $name => $fn) {
     }
 }
 
+$versionedPass = 0;
+$versionedFail = 0;
+if ($fail === 0) {
+    try {
+        $pdo->exec("CREATE TABLE IF NOT EXISTS schema_migrations (
+            version VARCHAR(120) NOT NULL PRIMARY KEY,
+            applied_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
+        ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4");
+
+        $migrationFiles = glob(__DIR__ . '/migrations/[0-9][0-9][0-9]_*.php') ?: [];
+        sort($migrationFiles, SORT_STRING);
+        $isApplied = $pdo->prepare('SELECT 1 FROM schema_migrations WHERE version = ? LIMIT 1');
+        $recordApplied = $pdo->prepare('INSERT INTO schema_migrations (version) VALUES (?)');
+
+        foreach ($migrationFiles as $migrationFile) {
+            $version = basename($migrationFile, '.php');
+            $isApplied->execute([$version]);
+            if ($isApplied->fetchColumn()) {
+                out($version . ' -> already applied', 'skip');
+                continue;
+            }
+
+            try {
+                $migration = require $migrationFile;
+                if (!is_callable($migration)) {
+                    throw new RuntimeException('Migration must return a callable.');
+                }
+                $migration($pdo);
+                $recordApplied->execute([$version]);
+                out($version . ' -> applied', 'ok');
+                $versionedPass++;
+            } catch (Throwable $e) {
+                out($version . ' -> ' . $e->getMessage(), 'error');
+                $versionedFail++;
+                break;
+            }
+        }
+    } catch (Throwable $e) {
+        out('Versioned migration runner -> ' . $e->getMessage(), 'error');
+        $versionedFail++;
+    }
+} else {
+    out('Versioned migrations skipped because a prerequisite migration failed.', 'warn');
+}
+
+$pass += $versionedPass;
+$fail += $versionedFail;
 out("Migration summary: $pass passed, $fail failed.", $fail ? 'warn' : 'ok');
 
 if (!$isCli) {
     echo '<hr><p style="color:#94a3b8;">This script may be re-run safely at any time. You may now delete or leave this file in place (admin-only via web).</p>
     <p><a href="../dashboard.php" style="color:#38bdf8;">← Back to Dashboard</a></p></div></body></html>';
+}
+
+if ($isCli && $fail > 0) {
+    exit(1);
 }

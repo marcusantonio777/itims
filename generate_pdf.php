@@ -98,7 +98,10 @@ if (preg_match('~^uploads/assets/[A-Za-z0-9._-]+$~', $photoPath)) {
         $photoUrl = 'generate_pdf.php?asset_photo_id=' . (int)$data['asset_id'];
     }
 }
-$logoPath = is_file(__DIR__ . '/assets/img/logo.png') ? 'assets/img/logo.png' : 'data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs=';
+$appBranding = app_branding($pdo);
+$logoPath = $appBranding['company_logo_path'] !== ''
+    ? 'brand_logo.php?v=' . rawurlencode(basename($appBranding['company_logo_path']))
+    : 'data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs=';
 
 $positionList = array_values(array_unique(array_filter(array_map(static function (array $employee): string {
     return (string)($employee['position'] ?? '');
@@ -140,7 +143,7 @@ if ($isComputerCategory) {
     $termsText = preg_replace_callback(
         '/^(\s*Password\s*:\s*).*$/mi',
         static function (array $matches): string {
-            return $matches[1] . 'questhotel';
+            return $matches[1] . 'Set individually by the system administrator';
         },
         (string)$termsText
     );
@@ -233,6 +236,9 @@ $printWidthMm = $paperWidth - 12;
 $printHeightMm = $paperHeight - 12;
 $fields = [
     'company_logo' => e($logoPath),
+    'product_name' => e($appBranding['product_name']),
+    'organization_name' => e($appBranding['organization_name']),
+    'department_label' => e($appBranding['department_label']),
     'paf_number' => e(str_replace('-', '', (string)$data['asset_tag']) . '-' . $logId),
     'date_issued' => e(date('F d, Y', strtotime((string)$data['date_issued']))),
     'employee_name' => e($data['employee_name']),
@@ -262,8 +268,8 @@ $fields = [
     'supplies_section' => $suppliesHtml,
     'terms' => nl2br(e((string)$termsText)),
     'prepared_by' => e(strtoupper(trim((string)($data['staff_name'] ?? '')) ?: auth_current_name() ?: 'IT STAFF')),
-    'noted_by' => 'MARIO GERALDEZ',
-    'noted_by_title' => 'ASST. IT MANAGER',
+    'noted_by' => '',
+    'noted_by_title' => 'Authorized Approver',
     'received_by' => $receivedBy,
     'received_by_title' => $receivedTitle,
     'generated_at' => e(date('Y-m-d H:i:s')),
@@ -275,7 +281,7 @@ $body = pdf_template_apply_fields($template, $fields);
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Property Accountability Form - <?php echo e($data['asset_tag']); ?></title>
+    <title><?php echo e($appBranding['product_name']); ?> Accountability Form - <?php echo e($data['asset_tag']); ?></title>
     <style>
         @page { size: <?php echo e($pageSize . ' ' . $orientation); ?>; margin: 6mm; }
         body { font-family: Arial, sans-serif; line-height: 1.4; color: #333; margin: 0; }

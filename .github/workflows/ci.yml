@@ -1,0 +1,61 @@
+name: CI
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    services:
+      mysql:
+        image: mysql:8.4
+        env:
+          MYSQL_ROOT_PASSWORD: root
+        ports:
+          - 3306:3306
+        options: >-
+          --health-cmd="mysqladmin ping -h 127.0.0.1 -uroot -proot"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.2'
+          extensions: pdo_mysql, fileinfo, openssl
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: npm
+      - name: Lint PHP files
+        run: find . -type f -name '*.php' -not -path './node_modules/*' -not -path './uploads/*' -print0 | xargs -0 -n1 php -l
+      - name: Test license secret encryption
+        run: php tests/license_secrets_test.php
+      - name: Test single-use form protection
+        run: php tests/csrf_test.php
+      - name: Initialize isolated MySQL database
+        run: mysql -h127.0.0.1 -uroot -proot < database.sql
+      - name: Verify fresh schema and prepare a legacy upgrade fixture
+        run: |
+          columns="$(mysql -h127.0.0.1 -uroot -proot itims_db -N -e "SELECT COUNT(*) FROM information_schema.COLUMNS WHERE TABLE_SCHEMA='itims_db' AND TABLE_NAME='software_licenses' AND COLUMN_NAME IN ('attachment_name','attachment_path')")"
+          test "$columns" = "2"
+          mysql -h127.0.0.1 -uroot -proot itims_db -e "ALTER TABLE software_licenses DROP COLUMN attachment_path, DROP COLUMN attachment_name; INSERT INTO software_licenses (software_name, license_key) VALUES ('migration-test', 'ci-legacy-key');"
+      - name: Run schema migrations twice
+        env:
+          ITIMS_DB_HOST: 127.0.0.1
+          ITIMS_DB_NAME: itims_db
+          ITIMS_DB_USER: root
+          ITIMS_DB_PASS: root
+          ITIMS_LICENSE_KEY_ENCRYPTION_KEY: eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHg=
+        run: |
+          php install/database_migrate.php
+          php install/database_migrate.php
+          php tests/migration_smoke.php
+      - name: Install dashboard dependencies
+        run: npm ci
+      - name: Type-check dashboard
+        run: npx tsc --noEmit -p tsconfig.dashboard.json
+      - name: Build dashboard
+        run: npm run dashboard:build

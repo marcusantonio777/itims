@@ -1,7 +1,7 @@
     <?php if (isset($_SESSION['staff_id'])): ?>
         </main>
         <footer class="bg-white border-t py-4 px-8 text-center text-gray-500 text-[10px] font-bold uppercase tracking-widest">
-            &copy; <?php echo date('Y'); ?> Quest Hotel IT Inventory Management System. All rights reserved.
+            &copy; <?php echo date('Y'); ?> <?php echo e($appBranding['organization_name']); ?> &middot; <?php echo e($appBranding['product_name']); ?>
         </footer>
     </div> <!-- Close Main Content Area -->
 
