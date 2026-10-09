@@ -1,0 +1,179 @@
+QUEST HOTEL
+IT EQUIPMENT AND PROPERTY ACCOUNTABILITY TERMS
+
+Purpose
+These terms apply when an employee receives, uses, or is assigned IT equipment,
+access credentials, supplies, or other company property. The employee should
+review the item and report any existing damage or missing accessories before
+signing the issuance record.
+
+GENERAL TERMS (APPLY TO ALL ITEMS)
+
+1. Use company property carefully, for its intended business purpose, and in
+   accordance with IT and security instructions.
+2. Do not lend, transfer, sell, alter, dismantle, or allow an unauthorized
+   person to use assigned property without approval from the responsible
+   department.
+3. Keep equipment and credentials secure. Do not disclose passwords, PINs,
+   access codes, or authentication prompts. Lock devices when unattended.
+4. Promptly report loss, theft, suspected unauthorized access, damage, or
+   malfunction to the IT department and the employee's supervisor. Do not
+   attempt unauthorized repairs or data recovery.
+5. Return the item, accessories, and any issued documentation when requested,
+   when reassigned, or when employment ends. Return items in reasonable
+   condition, allowing for ordinary wear from authorized use.
+6. Do not store, copy, or disclose confidential company or guest information
+   except as authorized. Follow company rules for data handling and disposal.
+7. The employee is responsible for promptly cooperating with inventory checks
+   and providing the item for inspection or maintenance when requested.
+8. Damage, loss, or missing accessories will be reviewed based on the facts,
+   applicable company policy, and applicable law. These terms do not authorize
+   an automatic deduction from wages or predetermine liability.
+9. The employee should ask the issuing department for clarification before
+   signing if any item, serial number, condition, or accessory is incorrect.
+
+CATEGORY-SPECIFIC TERMS
+
+KEYCARD
+- Keep the keycard in a secure place and use it only for the access assigned.
+- Do not lend, duplicate, photograph for sharing, or allow another person to
+  use the card to enter a controlled area.
+- Do not mark, punch, bend, or otherwise alter the card.
+- Report a lost, stolen, damaged, or non-working card immediately so access can
+  be disabled or the card replaced.
+- Return the keycard when access is no longer required or when requested.
+
+MOBILES PHONES
+- Use the phone and any company SIM or service plan in accordance with company
+  policy; avoid unauthorized charges and do not change service or security
+  settings without approval.
+- Protect the phone with the approved screen lock and security updates. Do not
+  jailbreak, root, or install unapproved software.
+- Keep company data in approved applications and promptly report suspected
+  loss, theft, compromise, or unusual charges.
+- Return the phone, SIM (if requested), charger, case, and other recorded
+  accessories. Follow IT instructions before removing company data or accounts.
+
+PHONE
+- These terms apply to phones recorded under the "Phone" category, including
+  mobile or desk phones as described on the issuance record.
+- Use the assigned phone and any associated line or SIM for authorized work.
+  Do not change account, forwarding, or security settings without approval.
+- Protect call records, contacts, messages, and any company information stored
+  on or accessible through the phone.
+- Report loss, theft, damage, service problems, or suspected compromise
+  promptly; return the phone and recorded accessories when requested.
+
+LAPTOPS
+- Carry the laptop in a protective manner and do not leave it unattended in
+  public or an unsecured vehicle.
+- Use the approved charger and accessories. Keep the device updated and use
+  approved security tools; do not disable encryption, endpoint protection, or
+  other security controls.
+- Do not install unauthorized applications, connect unapproved devices, or
+  store company information in personal accounts or unapproved cloud services.
+- Back up work only through approved company systems. Report loss, theft,
+  damage, or suspicious activity immediately.
+- Return the laptop, charger, bag, dock, and other accessories listed on the
+  issuance record.
+
+LAPTOP
+- The same laptop handling, security, software, data, incident-reporting, and
+  return requirements above apply to items recorded under "Laptop."
+- Confirm the device identifier, condition, charger, and accessories on the
+  issuance record before accepting the assignment.
+
+DESKTOP PC
+- Use the desktop PC only for authorized work. Do not open the case, relocate
+  it, or change internal components without IT approval.
+- Keep the computer and its ventilation areas clear; do not expose it to
+  liquids, excessive heat, or other avoidable hazards.
+- Do not disable security controls or install unapproved software or hardware.
+- Protect the display, keyboard, mouse, and other recorded accessories.
+- Report faults or damage promptly and return all assigned components when
+  requested or when reassigned.
+
+DESKTOP
+- The same authorized-use, physical-care, security, software, and return
+  requirements for desktop computers apply to items recorded under "Desktop."
+- The issuance record should identify the assigned computer and any included
+  monitor, keyboard, mouse, cables, or other accessories.
+
+MONITOR
+- Handle the monitor carefully; use the stand or approved mounting equipment.
+- Do not open, modify, or attempt to repair the monitor. Keep liquids away and
+  avoid pressure or impact to the screen.
+- Use approved display cables and mounting changes only with IT authorization.
+- Return the monitor, stand, power adapter, cables, and other recorded
+  accessories when requested.
+
+PERIPHERALS & NETWORKING
+- Use peripherals and networking equipment only for authorized business
+  purposes and connect them only to approved devices or networks.
+- Do not change network configuration, credentials, firmware, cabling, or
+  security settings without IT authorization.
+- Protect adapters, docks, keyboards, mice, cables, access points, switches,
+  and other recorded components from loss or damage.
+- Do not connect unknown or personally owned networking equipment to company
+  networks without approval.
+- Report faults, missing components, or suspected unauthorized connections
+  promptly and return all assigned items when requested.
+
+SECURITY & ACCESS CONTROL
+- Use assigned security and access-control equipment only for the approved
+  purpose and locations.
+- Keep credentials, keys, tokens, and access devices secure; do not share,
+  copy, or bypass access controls.
+- Do not change configurations, permissions, recordings, or access lists
+  without authorization.
+- Report loss, tampering, malfunction, or suspected unauthorized access
+  immediately so protective action can be taken.
+- Return all equipment, keys, tokens, and accessories when access is no longer
+  required or when requested.
+
+CONSUMABLES, PARTS & SUPPLIES
+- Use issued consumables and supplies for authorized work and in a reasonable
+  manner that avoids unnecessary waste.
+- Do not remove, transfer, or distribute stock for personal use or to another
+  location without approval and an appropriate inventory record.
+- Store parts and supplies safely and follow handling instructions where
+  provided.
+- Report shortages, damaged stock, incorrect quantities, or defects promptly.
+- Record usage, returns, or stock transfers as required by the department.
+
+OTHER OR NEW CATEGORIES
+- Apply the General Terms above and follow any written handling instructions
+  supplied with the item.
+- Before issuing a new type of item, document its identifier, condition,
+  accessories, permitted use, and any item-specific handling or return
+  instructions on the issuance record.
+
+EMPLOYEE ACKNOWLEDGMENT
+
+I acknowledge receipt of the item(s) and accessories listed in the associated
+issuance record. I have had an opportunity to inspect them and record any
+existing damage or missing components. I have read and understood these terms
+and agree to follow applicable company policies and IT instructions.
+
+Employee name: _____________________________________________________________
+
+Department / position: _____________________________________________________
+
+Item(s) / asset tag(s): ____________________________________________________
+
+Condition or exceptions noted: _____________________________________________
+
+____________________________________________________________________________
+
+Employee signature: ______________________________  Date: _________________
+
+Issued by: _______________________________________  Date: _________________
+
+Returned / received by: __________________________  Date: _________________
+
+Return condition / notes: __________________________________________________
+
+____________________________________________________________________________
+
+This document is a general operational acknowledgment. It should be reviewed
+against current company policies and applicable local law before official use.

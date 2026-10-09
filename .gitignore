@@ -1,0 +1,32 @@
+# Local database credentials and environment configuration
+/config/db.local.php
+/.env
+/.env.*
+!/.env.example
+
+# User-uploaded documents, photos, and managed files
+/uploads/*
+!/uploads/.htaccess
+!/uploads/assets/
+/uploads/assets/*
+!/uploads/assets/.htaccess
+!/uploads/licenses/
+/uploads/licenses/*
+!/uploads/licenses/.htaccess
+!/uploads/file_manager/
+/uploads/file_manager/*
+!/uploads/file_manager/.htaccess
+
+# Local editor and operating-system files
+/.trae/
+/.vscode/
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Runtime logs, temporary files, and local database exports
+*.log
+*.tmp
+*.bak
+*.sql.gz
+*.dump
