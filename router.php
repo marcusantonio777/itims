@@ -1,26 +1,29 @@
 <?php
+require_once __DIR__ . '/includes/direct_access_guard.php';
+
 $requestPath = rawurldecode((string)(parse_url($_SERVER['REQUEST_URI'] ?? '/', PHP_URL_PATH) ?: '/'));
 $normalizedPath = '/' . ltrim(str_replace('\\', '/', $requestPath), '/');
-$licensePrefix = '/uploads/licenses';
 
-if (stripos($normalizedPath, $licensePrefix) === 0
-    && ($normalizedPath === $licensePrefix || isset($normalizedPath[strlen($licensePrefix)])
-        && $normalizedPath[strlen($licensePrefix)] === '/')) {
-    http_response_code(403);
+if (strcasecmp($normalizedPath, '/router.php') === 0) {
+    http_response_code(404);
     header('Content-Type: text/plain; charset=UTF-8');
-    exit('Direct access to license attachments is not allowed.');
+    exit('Page not found.');
 }
 
-$licenseRoot = realpath(__DIR__ . '/uploads/licenses');
-$requestedFile = realpath(__DIR__ . DIRECTORY_SEPARATOR . ltrim(str_replace('/', DIRECTORY_SEPARATOR, $normalizedPath), DIRECTORY_SEPARATOR));
-if ($licenseRoot !== false && $requestedFile !== false) {
-    $root = rtrim($licenseRoot, DIRECTORY_SEPARATOR);
-    $rootPrefix = $root . DIRECTORY_SEPARATOR;
-    if (strcasecmp($requestedFile, $root) === 0
-        || strncasecmp($requestedFile, $rootPrefix, strlen($rootPrefix)) === 0) {
-        http_response_code(403);
-        header('Content-Type: text/plain; charset=UTF-8');
-        exit('Direct access to license attachments is not allowed.');
+if (itims_direct_access_blocked($normalizedPath)) {
+    http_response_code(403);
+    header('Content-Type: text/plain; charset=UTF-8');
+    exit('Direct access to protected application files is not allowed.');
+}
+
+$requestedRoute = $normalizedPath === '/' || $normalizedPath === '/index.php'
+    ? 'index'
+    : basename($normalizedPath, '.php');
+if (strtolower(pathinfo($normalizedPath, PATHINFO_EXTENSION)) === 'php') {
+    require_once __DIR__ . '/app/bootstrap.php';
+    if (app_resolve_route($requestedRoute) !== null) {
+        app_dispatch();
+        return true;
     }
 }
 

@@ -134,6 +134,10 @@ $migrations['system_settings_table'] = static function (PDO $pdo): string {
         'organization_name' => 'Your Organization',
         'department_label' => 'IT Department',
         'company_logo_path' => '',
+        'pdf_prepared_by_name' => '',
+        'pdf_prepared_by_title' => '',
+        'pdf_noted_by_name' => '',
+        'pdf_noted_by_title' => '',
     ];
     $stmt = $pdo->prepare("INSERT IGNORE INTO system_settings (setting_key, setting_value) VALUES (?, ?)");
     foreach ($defaults as $key => $value) {

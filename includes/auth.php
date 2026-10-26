@@ -63,7 +63,7 @@ function auth_access_modules(): array {
         'dashboard' => ['label' => 'Dashboard', 'pages' => ['dashboard.php']],
         'inventory' => ['label' => 'Inventory', 'pages' => ['inventory.php', 'asset_details.php']],
         'supplies' => ['label' => 'Supplies', 'pages' => ['supplies.php']],
-        'employees' => ['label' => 'Employees', 'pages' => ['employees.php', 'employee_details.php']],
+        'employees' => ['label' => 'Employees', 'pages' => ['employees.php', 'employee_details.php', 'departments.php']],
         'issuance' => ['label' => 'Issuance', 'pages' => ['issuance.php', 'generate_pdf.php']],
         'keycards' => ['label' => 'Keycards', 'pages' => ['keycards.php']],
         'room_management' => ['label' => 'Item Deployment', 'pages' => ['room_management.php']],

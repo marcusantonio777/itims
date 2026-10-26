@@ -23,20 +23,22 @@ jobs:
       - uses: actions/checkout@v4
       - uses: shivammathur/setup-php@v2
         with:
-          php-version: '8.2'
+          php-version: '8.5'
           extensions: pdo_mysql, fileinfo, openssl
-      - uses: actions/setup-node@v4
-        with:
-          node-version: '20'
-          cache: npm
       - name: Lint PHP files
         run: find . -type f -name '*.php' -not -path './node_modules/*' -not -path './uploads/*' -print0 | xargs -0 -n1 php -l
       - name: Test license secret encryption
         run: php tests/license_secrets_test.php
       - name: Test single-use form protection
         run: php tests/csrf_test.php
+      - name: Test server-rendered dashboard
+        run: php tests/dashboard_view_test.php
+      - name: Test PDF issuance signatories
+        run: php tests/pdf_signatories_test.php
+      - name: Test application routing
+        run: php tests/app_routes_test.php
       - name: Initialize isolated MySQL database
-        run: mysql -h127.0.0.1 -uroot -proot < database.sql
+        run: mysql -h127.0.0.1 -uroot -proot < database/schema.sql
       - name: Verify fresh schema and prepare a legacy upgrade fixture
         run: |
           columns="$(mysql -h127.0.0.1 -uroot -proot itims_db -N -e "SELECT COUNT(*) FROM information_schema.COLUMNS WHERE TABLE_SCHEMA='itims_db' AND TABLE_NAME='software_licenses' AND COLUMN_NAME IN ('attachment_name','attachment_path')")"
@@ -53,9 +55,3 @@ jobs:
           php install/database_migrate.php
           php install/database_migrate.php
           php tests/migration_smoke.php
-      - name: Install dashboard dependencies
-        run: npm ci
-      - name: Type-check dashboard
-        run: npx tsc --noEmit -p tsconfig.dashboard.json
-      - name: Build dashboard
-        run: npm run dashboard:build

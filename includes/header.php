@@ -81,7 +81,7 @@
             <?php endif; ?>
             <?php if (auth_can_access_page('employees.php') || auth_can_access_page('issuance.php') || auth_can_access_page('room_management.php') || auth_can_access_page('maintenance.php') || auth_can_access_page('disposal.php')): ?><p class="px-3 pb-1 pt-5 text-[9px] font-bold uppercase tracking-[0.18em] text-slate-500">People &amp; operations</p><?php endif; ?>
             <?php if (auth_can_access_page('employees.php')): ?>
-            <a href="employees.php" class="flex items-center space-x-3 rounded-xl px-3 py-2.5 transition hover:bg-white/5 <?php echo $current_page == 'employees.php' ? 'sidebar-active' : 'text-slate-300'; ?>">
+            <a href="employees.php" class="flex items-center space-x-3 rounded-xl px-3 py-2.5 transition hover:bg-white/5 <?php echo in_array($current_page, ['employees.php', 'departments.php'], true) ? 'sidebar-active' : 'text-slate-300'; ?>">
                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"></path></svg>
                 <span class="font-medium text-sm">Employees</span>
             </a>

@@ -1,0 +1,14 @@
+Options -Indexes
+DirectoryIndex index.php
+
+<FilesMatch "(?i)\.(sql|dump|bak|tmp|log)$">
+    Require all denied
+</FilesMatch>
+
+RewriteEngine On
+RewriteRule ^(?:\.git|\.github|\.trae|app|config|database|frontend|includes|node_modules|tests)(?:/|$) - [F,L,NC]
+RewriteRule ^install/migrations(?:/|$) - [F,L,NC]
+RewriteRule ^(?:create_disposal_table|fix_database)\.php$ - [F,L,NC]
+RewriteRule (^|/)\. - [F,L]
+RewriteRule ^index\.php$ - [L,NC]
+RewriteRule ^([A-Za-z0-9_-]+)\.php$ index.php [QSA,L,NC]

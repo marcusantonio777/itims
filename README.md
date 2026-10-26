@@ -1,8 +1,8 @@
  # IT Asset Manager
 
  IT Asset Manager is a PHP/MySQL application for managing IT assets, supplies,
- employee accountability, keycards, maintenance, deployments, software
- licenses, and audit history.
+ employee and department management, accountability, keycards, maintenance,
+ deployments, software licenses, and audit history.
 
 This repository contains application source and the install schema. It does
 not contain production data or required user-uploaded files. Keep the GitHub
@@ -11,17 +11,19 @@ and ownership have been reviewed for public release.
 
 ## Requirements
 
-- PHP 8.x
+- PHP 8.0 or later (PHP 8.5 is used in CI)
 - PHP extensions: PDO MySQL, OpenSSL, and Fileinfo
 - MySQL 8.x (or compatible MariaDB)
-- Node.js 20+ and npm (only required when rebuilding the React dashboard)
 
 ## Quick Start (Local)
 
-1. Install XAMPP with PHP 8.x and MySQL/MariaDB, then start Apache and MySQL.
+1. Install XAMPP with PHP 8.0+ and MySQL/MariaDB, then start Apache and MySQL.
+   Keep Apache's `mod_rewrite` enabled and `AllowOverride` set to `All` for this
+   project so the existing `*.php` application URLs continue to route through
+   the front controller.
 
 2. Open phpMyAdmin, create the `itims_db` database, select it, and import
-   `database.sql`.
+   `database/schema.sql`.
 
 3. Configure local database credentials:
 
@@ -41,8 +43,9 @@ and ownership have been reviewed for public release.
 
    This ensures required supporting tables exist, including linked employee
    recipients for shared accountability records, adds separate Keycards page
-   permissions, and normalizes legacy `Admin` / `Tech` roles to `admin` /
-   `staff` / `viewer`.
+   permissions, creates the department directory from existing employee
+   records, normalizes legacy `Admin` / `Tech` roles to `admin` / `staff` /
+   `viewer`, and prepares keycard employee links for multi-employee assignments.
 
 5. With Apache and MySQL running, open `http://localhost/itims/install/setup.php`
    and create the first administrator using a unique password of at least 12
@@ -61,15 +64,8 @@ and ownership have been reviewed for public release.
 
    - http://localhost:8000/
 
-The dashboard is built with React and TypeScript; the rest of the application
-continues to use PHP and MySQL. Its compiled browser assets are included in
-`assets/dashboard/`, so running the deployed app does not require Node.js. To
-rebuild the dashboard after changing its frontend source:
-
-```bash
-npm install
-npm run dashboard:build
-```
+The dashboard and application pages are rendered by PHP and use MySQL for
+data storage. No Node.js build step is required to run or update the dashboard.
 
 ## Production Security
 
@@ -87,21 +83,21 @@ npm run dashboard:build
 
 ## Project Structure
 
-- `index.php`: login page
-- `dashboard.php`: PHP dashboard data and authorization; React/TypeScript dashboard source is in `frontend/dashboard/`
-- `inventory.php`: asset CRUD + photo uploads
-- `settings.php`: per-installation product and organization branding
-- `supplies.php`: supply CRUD + stock movement logs
-- `issuance.php`: asset/supply issuance + accountability logs
-- `room_management.php`: deploy room-related IT supplies to rooms, employees, or custom targets
-- `maintenance.php`: maintenance logging
-- `reports.php`: reports and exports
-- `software_licenses.php`: track software contracts, renewals, payments, and update schedules
-- `activity_logs.php`: audit trail viewer
-- `file_manager.php`: authenticated shared file explorer for managed files
-- `config/db.php`: database connection and shared helpers
-- `includes/`: shared layout (`header.php`, `footer.php`)
+- `index.php`: public front controller; routes legacy page URLs through an allowlist
+- `app/bootstrap.php`: route definitions and application dispatch
+- `app/pages/`: PHP application pages and request handlers
+- `includes/`: shared layout, authentication, dashboard view, and security helpers
+- `config/`: database configuration; local credentials stay untracked
+- `database/schema.sql`: initial database schema
+- `database/legacy/`: retained one-off SQL scripts for older installations
+- `install/`: first-run setup and database migrations
+- `tests/`: automated PHP regression tests
+- `assets/`: browser styles, images, and other static files
 - `uploads/`: user uploads (asset photos, scanned files, etc.)
+
+Apache and the built-in PHP development server preserve the existing page
+URLs. Application source, configuration, database scripts, and tests are
+blocked from direct web access.
 
 The file explorer stores managed files under `uploads/file_manager/`, blocks
 direct web access to that directory, and serves files only through the
@@ -127,26 +123,37 @@ the default form for matching issued assets. Run
 `php install/database_migrate.php` to create the `pdf_templates` and
 `pdf_category_templates` tables. Saved templates are sanitized before storage.
 Re-running the migration will not reset an existing administrator password.
-Laptop issuance PDFs use the configured default terms. The computer login
-username comes from the receiving employee record; no shared computer password
-is inserted into generated forms. Phone and keycard PDFs use their respective
+Laptop issuance PDFs use the configured default terms. Use the credential
+editor beside an issuance's print action to save a username and password for
+that specific assignment, regardless of asset category. Saved credentials are
+encrypted with the configured license-key encryption key and appear in the
+printed PAR when set. Every accountable employee is listed in the recipient and
+Received By areas. Run `php install/database_migrate.php` to add the issuance
+credential fields to existing databases. Phone and keycard PDFs use their respective
 layouts unless a category-specific layout has been saved. The PDF
-designer preview mirrors those category layouts. Keycard assignments require
-one employee and a card level (Grandmaster, Master, Emergency, Floor Master,
-Room Master, or a custom level); access is recorded as All Floors and the
-expiry is set to one year after assignment. Run
-`php install/database_migrate.php` to add the keycard assignment fields to
-existing databases. Use **Keycards** in the sidebar to register physical cards,
-review available and assigned cards, monitor expiry, and launch an assignment.
-Assignment opens Issuance with the selected card preloaded. Active assignments
-are excluded from the available-asset list to prevent assigning a card twice.
+designer preview mirrors those category layouts. Keycards receive an automatic,
+unique inventory ID; recording the physical chip/printed UID is optional, but
+any UID entered must be unique. A keycard may be assigned to multiple employees
+in one issuance. Choose Grandmaster, Master, Emergency, Floor Master, Room
+Master, or enter a custom keycard type, and enter the allowed floor access.
+Assignments expire one year after issue. Administrators can configure the
+Prepared By and Noted By names and position/titles in **Settings**; leaving a
+name blank uses the issuing staff member recorded on the accountability form,
+and leaving a position/title blank uses the form default. Run
+`php install/database_migrate.php` to backfill employee links and prepare
+existing databases for multi-employee keycard assignments. Use **Keycards** in
+the sidebar to register physical cards, review available and assigned cards,
+monitor expiry, and launch an assignment. Assignment opens Issuance with the
+selected card preloaded. Active assignments are excluded from the
+available-asset list to prevent assigning a card twice.
 For phone/mobile categories, Inventory shows service fields for mobile number,
 plan, monthly limit, inclusions, other rates, and activation date. These values
 are saved with the asset, shown in the issuance summary, and merged into its
 phone form; existing labeled Other Details values such as
 `Mobile Number: 09981234567` and `Plan: Corporate` remain supported.
-Keycards use the asset's Card ID/serial field; the level, employee, and
-one-year validity are recorded when the card is assigned. Assets with active
+Keycards display the generated asset tag as the system Keycard ID; the
+optional physical UID, keycard type, floor access, linked employees, and
+one-year validity are recorded for each assignment. Assets with active
 assignments cannot be deleted. History deletion is disabled by default;
 administrators can explicitly enable permanent deletion of linked history for
 sample/test cleanup in Settings. Unreferenced, non-deployed assets can be
@@ -157,7 +164,7 @@ account recorded when the issuance was created.
 
 ## Database Notes
 
-The main schema is in `database.sql`. Apply schema changes deliberately with
+The main schema is in `database/schema.sql`. Apply schema changes deliberately with
 `php install/database_migrate.php` during installation and upgrades, not as part
 of ordinary user requests. The compatibility migrations are safe to re-run;
 new one-time migrations live in `install/migrations/` and are tracked in
@@ -210,13 +217,21 @@ migrated keys are encrypted with AES-256-GCM.
 
 ## Automated checks
 
-GitHub Actions runs PHP syntax checks, license-secret regression tests,
-MySQL schema migrations twice against an isolated database, strict dashboard
-TypeScript checks, and the dashboard production build. Run the standalone
+GitHub Actions runs PHP 8.5 syntax checks, license-secret regression tests,
+MySQL schema migrations twice against an isolated database, and PHP security
+regression tests, including dashboard output escaping and PDF issuance
+signatories. Run the standalone
 encryption tests locally with:
 
 ```powershell
 php tests\license_secrets_test.php
+```
+
+Run the dashboard and routing regression tests with:
+
+```powershell
+php tests\dashboard_view_test.php
+php tests\app_routes_test.php
 ```
 
 ## Category-Based Asset Fields
